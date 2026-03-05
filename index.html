@@ -4,13 +4,12 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Portfolio — Monteur Vidéo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&family=Outfit:wght@200;300&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --white: #fafaf8;
-      --off:   #ebebE5;
       --ink:   #111110;
       --muted: #999990;
       --accent:#c8b89a;
@@ -66,17 +65,21 @@
       from { opacity:0; transform:translateY(-14px); }
       to   { opacity:1; transform:translateY(0); }
     }
+    /* 4. Nouvelle police pour le nom — Outfit, légère, sans italique */
     .hdr-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300; font-size: 1.35rem;
-      letter-spacing: .02em; line-height: 1.15;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 200;
+      font-size: 1.3rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      line-height: 1.15;
     }
     .hdr-name small {
       display: block;
       font-family: 'DM Mono', monospace;
-      font-size: .6rem; font-weight: 300;
+      font-size: .58rem; font-weight: 300;
       letter-spacing: .14em; text-transform: uppercase;
-      color: var(--muted); margin-top: 5px;
+      color: var(--muted); margin-top: 6px;
     }
     .hdr-contact {
       font-size: .7rem; color: var(--muted);
@@ -105,36 +108,17 @@
       height: 100%;
       overflow: hidden;
       flex-shrink: 0;
-      /* width set by JS */
       transition: width .55s cubic-bezier(.23,1,.32,1);
-      border-right: 1px solid var(--line);
+      border-right: 1px solid rgba(255,255,255,0.15);
     }
     .panel:last-child { border-right: none; }
 
-    /* Thumbnail */
-    .panel-thumb {
+    /* 2. Bloc couleur dégradé (remplace la miniature) */
+    .panel-color {
       position: absolute; inset: 0; z-index: 2;
       transition: opacity .45s ease;
     }
-    .panel-thumb img {
-      width: 100%; height: 100%;
-      object-fit: cover; display: block;
-      filter: grayscale(10%);
-    }
-    .panel.active .panel-thumb { opacity: 0; pointer-events: none; }
-
-    /* Placeholder */
-    .panel-ph {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(175deg, #e8e6de, #d0cec4);
-    }
-    .panel-ph span {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.8rem; font-weight: 300;
-      color: var(--accent); opacity: .55;
-      writing-mode: vertical-rl;
-    }
+    .panel.active .panel-color { opacity: 0; pointer-events: none; }
 
     /* iframe */
     .panel-iframe { position: absolute; inset: 0; z-index: 1; }
@@ -145,14 +129,17 @@
     }
     .panel.active .panel-iframe iframe { pointer-events: auto; }
 
-    /* Vertical title label */
+    /* 3. Titre vertical — blanc avec contour noir */
     .panel-vlabel {
       position: absolute;
       bottom: 36px; left: 50%;
       transform: translateX(-50%) rotate(180deg);
       writing-mode: vertical-rl;
       font-size: .58rem; letter-spacing: .13em;
-      text-transform: uppercase; color: var(--muted);
+      text-transform: uppercase;
+      color: #ffffff;
+      -webkit-text-stroke: .4px #111110;
+      text-shadow: 0 0 6px rgba(0,0,0,.4);
       white-space: nowrap; z-index: 6;
       transition: opacity .3s ease;
       pointer-events: none;
@@ -190,12 +177,30 @@
       letter-spacing: -.01em;
       opacity: 0; transform: translateY(6px);
       transition: opacity .35s ease, transform .35s ease;
+      flex: 1;
     }
     #info-title.on { opacity: 1; transform: translateY(0); }
+
+    /* 1. Zone artiste — centre */
+    #info-artist {
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      font-size: .68rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      flex: 1;
+      opacity: 0; transform: translateY(6px);
+      transition: opacity .35s ease .08s, transform .35s ease .08s;
+    }
+    #info-artist.on { opacity: 1; transform: translateY(0); }
+
     #info-meta {
       font-size: .68rem; color: var(--muted);
       letter-spacing: .09em; text-transform: uppercase;
       text-align: right; line-height: 2;
+      flex: 1;
       opacity: 0; transform: translateY(6px);
       transition: opacity .35s ease .05s, transform .35s ease .05s;
     }
@@ -219,12 +224,12 @@
   <!-- Header -->
   <header id="hdr">
     <div class="hdr-name">
-      Mahé RICHARD-SCHMIDT
+      Prénom Nom
       <small>Monteur vidéo</small>
     </div>
     <div class="hdr-contact">
-      <a href="mailto:maherichardschmidt@gmail.com">maherichardschmidt@gmail.com</a><br>
-      <a href="tel:+33600000000">+33 6 71 45 19 71</a>
+      <a href="mailto:ton@email.com">ton@email.com</a><br>
+      <a href="tel:+33600000000">+33 6 00 00 00 00</a>
     </div>
   </header>
 
@@ -246,23 +251,33 @@
 // ─────────────────────────────────────────────────────
 // ↓↓↓  TES VIDÉOS  ↓↓↓
 const videos = [
-  { id: "XYP9Ufletss", title: "POUF", real: "Mahé RICHARD-SCHMIDT", year: "2025" },
-  { id: "XqMseG4eQ9o", title: "Renée Costes", real: "Nicolas ROMIEU", year: "2023" },
-  { id: "I80fSVbp-eE", title: "Neoma", real: "Nicolas ROMIEU", year: "2023" },
-  { id: "XTDjJ9pvYJI", title: "Albert Koski", real: "Nicolas ROMIEU", year: "2022" },
-  { id: "muCyrhqdBwA", title: "Garage LMR", real: "Nicolas ROMIEU", year: "2023" },
-  { id: "VEVohpQye-I", title: "Crash au Mali", year: "2023" },
-  { id: "TVLk2qBD0DM", title: "La chine et le Ping-Pong", year: "2024" },
-  { id: "Nog0dxvLhQY", title: "Centaines de roses", real: "Léo VIEIRA", year: "2024" },
-  { id: "nUmqWk7Q4no", title: "Continuum", real: "Nicolas ROMIEU", year: "2016", artist: "Luke Anger" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 01", real: "Réalisateur", year: "2024" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 02", real: "Réalisateur", year: "2023" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 03", real: "Réalisateur", year: "2024" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 04", real: "Réalisateur", year: "2022" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 05", real: "Réalisateur", year: "2023" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 06", real: "Réalisateur", year: "2024" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 07", real: "Réalisateur", year: "2023" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 08", real: "Réalisateur", year: "2022" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 09", real: "Réalisateur", year: "2024" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 10", real: "Réalisateur", year: "2023" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 11", real: "Réalisateur", year: "2024" },
+  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 12", real: "Réalisateur", year: "2022" },
 ];
 // ─────────────────────────────────────────────────────
 
-const N          = videos.length;
-const acc        = document.getElementById('acc');
+const N         = videos.length;
+const acc       = document.getElementById('acc');
 const infoTitle  = document.getElementById('info-title');
+const infoArtist = document.getElementById('info-artist');
 const infoMeta   = document.getElementById('info-meta');
 const accWrap    = document.getElementById('acc-wrap');
+
+// 2. Génère les couleurs de dégradé blanc → noir réparties sur N panneaux
+function panelColor(i) {
+  const light = Math.round(255 - (i / (N - 1)) * 255);
+  return `rgb(${light},${light},${light})`;
+}
 
 // Build panels
 const panels = videos.map((v, i) => {
@@ -270,17 +285,10 @@ const panels = videos.map((v, i) => {
   panel.className = 'panel';
   panel.style.animationDelay = `${i * 0.045}s`;
 
-  // Thumb
-  const thumb = document.createElement('div');
-  thumb.className = 'panel-thumb';
-  const img = document.createElement('img');
-  img.src = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
-  img.alt = v.title;
-  img.loading = 'lazy';
-  img.onerror = () => {
-    thumb.innerHTML = `<div class="panel-ph"><span>0${i+1}</span></div>`;
-  };
-  thumb.appendChild(img);
+  // Bloc couleur (remplace miniature)
+  const colorBlock = document.createElement('div');
+  colorBlock.className = 'panel-color';
+  colorBlock.style.background = panelColor(i);
 
   // iframe
   const iframeWrap = document.createElement('div');
@@ -297,7 +305,7 @@ const panels = videos.map((v, i) => {
   label.className = 'panel-vlabel';
   label.textContent = v.title;
 
-  panel.appendChild(thumb);
+  panel.appendChild(colorBlock);
   panel.appendChild(iframeWrap);
   panel.appendChild(label);
   acc.appendChild(panel);
@@ -306,11 +314,9 @@ const panels = videos.map((v, i) => {
 
 // ── Width logic ──
 function setWidths(activeIdx) {
-  const total   = accWrap.offsetWidth;
-  const ratio   = 16 / 9;
-  const h       = accWrap.offsetHeight;
-
-  // Active panel width = 16:9 of available height, capped at total * 0.78
+  const total  = accWrap.offsetWidth;
+  const ratio  = 16 / 9;
+  const h      = accWrap.offsetHeight;
   const activeW = Math.min(Math.round(ratio * h), Math.round(total * 0.78));
   const restW   = Math.round((total - activeW) / (N - 1));
 
@@ -328,36 +334,39 @@ function setWidths(activeIdx) {
   });
 }
 
-// Initial equal widths
 setWidths(null);
 
-// Mouse events on panels
+// Mouse events
 panels.forEach((p, i) => {
   p.addEventListener('mouseenter', () => {
     setWidths(i);
     infoTitle.textContent = videos[i].title;
-    infoMeta.innerHTML    = `Réal. ${videos[i].real}<br>${videos[i].year}`;
+    infoMeta.innerHTML = videos[i].real
+      ? `Réal. ${videos[i].real}<br>${videos[i].year}`
+      : videos[i].year;
     infoTitle.classList.add('on');
     infoMeta.classList.add('on');
+    // 1. Artiste
+    if (videos[i].artist) {
+      infoArtist.textContent = videos[i].artist;
+      infoArtist.classList.add('on');
+    } else {
+      infoArtist.textContent = '';
+      infoArtist.classList.remove('on');
+    }
     document.getElementById('cur-ring').classList.add('big');
-  });
-  p.addEventListener('mouseleave', () => {
-    // only reset if leaving towards outside accordion
   });
 });
 
-// Reset when mouse leaves the accordion entirely
 accWrap.addEventListener('mouseleave', () => {
   setWidths(null);
   infoTitle.classList.remove('on');
   infoMeta.classList.remove('on');
+  infoArtist.classList.remove('on');
   document.getElementById('cur-ring').classList.remove('big');
 });
 
-// Recompute on resize
-window.addEventListener('resize', () => {
-  setWidths(null);
-});
+window.addEventListener('resize', () => setWidths(null));
 
 // ── Cursor ──
 const dot  = document.getElementById('cur-dot');
