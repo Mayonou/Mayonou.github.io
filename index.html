@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portfolio — Monteur Vidéo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #fafaf8;
+      --off: #f0efe9;
+      --ink: #111110;
+      --muted: #888880;
+      --accent: #c8b89a;
+      --line: #e2e0d8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--white);
+      color: var(--ink);
+      min-height: 100vh;
+      cursor: none;
+    }
+
+    /* ── Custom cursor ── */
+    .cursor {
+      position: fixed;
+      width: 8px; height: 8px;
+      background: var(--ink);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.35s cubic-bezier(0.23,1,0.32,1), width 0.35s ease, height 0.35s ease, opacity 0.35s ease;
+      transform: translate(-50%, -50%);
+      opacity: 0.4;
+    }
+    .cursor-ring.expand {
+      width: 64px; height: 64px;
+      opacity: 0.15;
+    }
+
+    /* ── Header ── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 28px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: linear-gradient(to bottom, var(--white) 60%, transparent);
+    }
+
+    .header-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+    .header-name span {
+      display: block;
+      font-size: 0.65em;
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .header-contact {
+      text-align: right;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      line-height: 1.8;
+    }
+    .header-contact a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .header-contact a:hover { color: var(--ink); }
+
+    /* ── Info bar (fixed bottom) ── */
+    .info-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      background: linear-gradient(to top, var(--white) 60%, transparent);
+      pointer-events: none;
+    }
+
+    .info-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      max-width: 60vw;
+      line-height: 1.1;
+    }
+    .info-title.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .info-meta {
+      text-align: right;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease 0.05s, transform 0.4s ease 0.05s;
+      line-height: 1.9;
+    }
+    .info-meta.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Grid ── */
+    main {
+      padding: 130px 48px 100px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+    }
+
+    /* ── Video card ── */
+    .card {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: var(--off);
+      cursor: none;
+    }
+
+    /* Thumbnail placeholder */
+    .card-thumb {
+      position: absolute;
+      inset: 0;
+      background: var(--off);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+      z-index: 2;
+    }
+    .card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .card-thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #e8e6de 0%, #d4d1c7 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .thumb-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      font-weight: 300;
+      color: var(--accent);
+      opacity: 0.5;
+    }
+
+    /* iframe */
+    .card-iframe-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      transform: scale(1.04);
+      transition: transform 0.6s cubic-bezier(0.23,1,0.32,1);
+    }
+    .card:hover .card-iframe-wrap {
+      transform: scale(1);
+    }
+    .card-iframe-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* Hover expand effect */
+    .card {
+      transition: transform 0.5s cubic-bezier(0.23,1,0.32,1),
+                  z-index 0s 0.5s,
+                  box-shadow 0.5s ease;
+      z-index: 1;
+    }
+    .card:hover {
+      transform: scale(1.06);
+      z-index: 10;
+      transition: transform 0.5s cubic-bezier(0.23,1,0.32,1),
+                  z-index 0s,
+                  box-shadow 0.5s ease;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    }
+
+    /* On hover: hide thumb, enable iframe pointer events */
+    .card:hover .card-thumb {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .card:hover .card-iframe-wrap iframe {
+      pointer-events: auto;
+    }
+
+    /* Thin overlay line at bottom of card */
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1);
+      z-index: 20;
+    }
+    .card:hover::after {
+      transform: scaleX(1);
+    }
+
+    /* ── Divider ── */
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 60px 0 24px;
+      border-top: 1px solid var(--line);
+      margin-top: 60px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      header, .info-bar { padding: 20px 24px; }
+      main { padding: 110px 24px 90px; }
+    }
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; gap: 8px; }
+      .header-contact { text-align: left; }
+      .info-title { max-width: 90vw; }
+    }
+
+    /* ── Page load animation ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    header {
+      animation: fadeUp 0.8s cubic-bezier(0.23,1,0.32,1) both;
+    }
+    .card {
+      animation: fadeUp 0.7s cubic-bezier(0.23,1,0.32,1) both;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-name">
+      Prénom Nom
+      <span>Monteur vidéo</span>
+    </div>
+    <div class="header-contact">
+      <!-- ↓ Remplace par tes vraies infos ↓ -->
+      <a href="mailto:ton@email.com">ton@email.com</a><br>
+      <a href="tel:+33600000000">+33 6 00 00 00 00</a>
+    </div>
+  </header>
+
+  <!-- Info bar -->
+  <div class="info-bar">
+    <div class="info-title" id="infoTitle">—</div>
+    <div class="info-meta" id="infoMeta"></div>
+  </div>
+
+  <!-- Main grid -->
+  <main>
+    <div class="grid" id="grid">
+      <!-- Les cartes sont générées par JS -->
+    </div>
+  </main>
+
+  <script>
+    // ─────────────────────────────────────────────
+    // ↓↓↓  MODIFIE ICI TES VIDÉOS  ↓↓↓
+    // Pour chaque vidéo :
+    //   id    → l'ID YouTube (la partie après "watch?v=" dans l'URL)
+    //   title → nom de la vidéo affiché en bas
+    //   real  → nom du réalisateur
+    //   year  → année
+    // ─────────────────────────────────────────────
+    const videos = [
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 01", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 02", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 03", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 04", real: "Réalisateur", year: "2022" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 05", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 06", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 07", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 08", real: "Réalisateur", year: "2022" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 09", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 10", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 11", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 12", real: "Réalisateur", year: "2022" },
+    ];
+    // ─────────────────────────────────────────────
+
+    const grid = document.getElementById('grid');
+    const infoTitle = document.getElementById('infoTitle');
+    const infoMeta  = document.getElementById('infoMeta');
+
+    // Build cards
+    videos.forEach((v, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.animationDelay = `${i * 0.06}s`;
+
+      // Thumb (YouTube thumbnail)
+      const thumb = document.createElement('div');
+      thumb.className = 'card-thumb';
+      const img = document.createElement('img');
+      img.src = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
+      img.alt = v.title;
+      img.loading = 'lazy';
+      img.onerror = () => {
+        thumb.innerHTML = `<div class="card-thumb-placeholder"><span class="thumb-num">0${i+1}</span></div>`;
+      };
+      thumb.appendChild(img);
+
+      // iframe wrap
+      const wrap = document.createElement('div');
+      wrap.className = 'card-iframe-wrap';
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${v.id}?autoplay=1&mute=1&loop=1&playlist=${v.id}&controls=0&modestbranding=1&rel=0&showinfo=0`;
+      iframe.allow = 'autoplay; encrypted-media';
+      iframe.allowFullscreen = true;
+      iframe.title = v.title;
+      wrap.appendChild(iframe);
+
+      card.appendChild(thumb);
+      card.appendChild(wrap);
+
+      // Hover info
+      card.addEventListener('mouseenter', () => {
+        infoTitle.textContent = v.title;
+        infoMeta.innerHTML = `Réal. ${v.real}<br>${v.year}`;
+        infoTitle.classList.add('visible');
+        infoMeta.classList.add('visible');
+      });
+      card.addEventListener('mouseleave', () => {
+        infoTitle.classList.remove('visible');
+        infoMeta.classList.remove('visible');
+      });
+
+      grid.appendChild(card);
+    });
+
+    // ── Custom cursor ──
+    const cursor     = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top  = my + 'px';
+    });
+
+    // Ring follows with lag
+    (function animRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      cursorRing.style.left = rx + 'px';
+      cursorRing.style.top  = ry + 'px';
+      requestAnimationFrame(animRing);
+    })();
+
+    document.querySelectorAll('.card').forEach(c => {
+      c.addEventListener('mouseenter', () => cursorRing.classList.add('expand'));
+      c.addEventListener('mouseleave', () => cursorRing.classList.remove('expand'));
+    });
+  </script>
+</body>
+</html>
