@@ -17,13 +17,15 @@
       --line: #e2e0d8;
     }
 
-    html { scroll-behavior: smooth; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
 
     body {
       font-family: 'DM Mono', monospace;
       background: var(--white);
       color: var(--ink);
-      min-height: 100vh;
       cursor: none;
     }
 
@@ -35,7 +37,6 @@
       border-radius: 50%;
       pointer-events: none;
       z-index: 9999;
-      transition: transform 0.15s ease, opacity 0.15s ease;
       transform: translate(-50%, -50%);
     }
     .cursor-ring {
@@ -45,9 +46,9 @@
       border-radius: 50%;
       pointer-events: none;
       z-index: 9998;
-      transition: transform 0.35s cubic-bezier(0.23,1,0.32,1), width 0.35s ease, height 0.35s ease, opacity 0.35s ease;
       transform: translate(-50%, -50%);
       opacity: 0.4;
+      transition: width 0.35s ease, height 0.35s ease, opacity 0.35s ease;
     }
     .cursor-ring.expand {
       width: 64px; height: 64px;
@@ -64,6 +65,12 @@
       justify-content: space-between;
       align-items: flex-start;
       background: linear-gradient(to bottom, var(--white) 60%, transparent);
+      animation: fadeDown 0.8s cubic-bezier(0.23,1,0.32,1) both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     .header-name {
@@ -144,105 +151,113 @@
       transform: translateY(0);
     }
 
-    /* ── Grid ── */
-    main {
-      padding: 130px 48px 100px;
+    /* ── Accordion ── */
+    .accordion {
+      display: flex;
+      flex-direction: row;
+      width: 100vw;
+      height: 100vh;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-    }
-
-    /* ── Video card ── */
-    .card {
+    .panel {
+      flex: 1 1 0;
       position: relative;
-      aspect-ratio: 16/9;
       overflow: hidden;
-      background: var(--off);
       cursor: none;
+      transition: flex 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+      background: var(--off);
+      min-width: 0;
     }
 
-    /* Thumbnail placeholder */
-    .card-thumb {
+    /* Siblings shrink when one is hovered */
+    .accordion:has(.panel:hover) .panel {
+      flex: 0.05 1 0;
+    }
+    .accordion .panel:hover {
+      flex: 16 1 0;
+    }
+
+    /* Thumbnail */
+    .panel-thumb {
       position: absolute;
       inset: 0;
-      background: var(--off);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.5s ease;
       z-index: 2;
+      transition: opacity 0.5s ease;
     }
-    .card-thumb img {
+    .panel-thumb img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      filter: grayscale(15%);
     }
-    .card-thumb-placeholder {
+
+    .panel:hover .panel-thumb {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .panel-thumb-placeholder {
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #e8e6de 0%, #d4d1c7 100%);
+      background: linear-gradient(180deg, #e8e6de 0%, #d4d1c7 100%);
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .thumb-num {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 3rem;
+      font-size: 2rem;
       font-weight: 300;
       color: var(--accent);
-      opacity: 0.5;
+      opacity: 0.6;
+      writing-mode: vertical-rl;
     }
 
     /* iframe */
-    .card-iframe-wrap {
+    .panel-iframe-wrap {
       position: absolute;
       inset: 0;
       z-index: 1;
-      transform: scale(1.04);
-      transition: transform 0.6s cubic-bezier(0.23,1,0.32,1);
     }
-    .card:hover .card-iframe-wrap {
-      transform: scale(1);
-    }
-    .card-iframe-wrap iframe {
+    .panel-iframe-wrap iframe {
       width: 100%;
       height: 100%;
       border: none;
       display: block;
       pointer-events: none;
     }
-
-    /* Hover expand effect */
-    .card {
-      transition: transform 0.5s cubic-bezier(0.23,1,0.32,1),
-                  z-index 0s 0.5s,
-                  box-shadow 0.5s ease;
-      z-index: 1;
-    }
-    .card:hover {
-      transform: scale(1.06);
-      z-index: 10;
-      transition: transform 0.5s cubic-bezier(0.23,1,0.32,1),
-                  z-index 0s,
-                  box-shadow 0.5s ease;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-    }
-
-    /* On hover: hide thumb, enable iframe pointer events */
-    .card:hover .card-thumb {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .card:hover .card-iframe-wrap iframe {
+    .panel:hover .panel-iframe-wrap iframe {
       pointer-events: auto;
     }
 
-    /* Thin overlay line at bottom of card */
-    .card::after {
+    /* Vertical label */
+    .panel-label {
+      position: absolute;
+      bottom: 52px;
+      left: 50%;
+      transform: translateX(-50%) rotate(180deg);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      z-index: 5;
+      opacity: 1;
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+      overflow: hidden;
+      max-height: 60vh;
+      text-overflow: ellipsis;
+    }
+    .panel:hover .panel-label {
+      opacity: 0;
+    }
+
+    /* Accent line */
+    .panel::after {
       content: '';
       position: absolute;
       bottom: 0; left: 0; right: 0;
@@ -250,132 +265,92 @@
       background: var(--accent);
       transform: scaleX(0);
       transform-origin: left;
-      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1);
+      transition: transform 0.5s cubic-bezier(0.23,1,0.32,1);
       z-index: 20;
     }
-    .card:hover::after {
+    .panel:hover::after {
       transform: scaleX(1);
     }
 
-    /* ── Divider ── */
-    .section-label {
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 60px 0 24px;
-      border-top: 1px solid var(--line);
-      margin-top: 60px;
+    /* Separator */
+    .panel + .panel {
+      border-left: 1px solid var(--line);
     }
 
-    /* ── Responsive ── */
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(2, 1fr); }
-      header, .info-bar { padding: 20px 24px; }
-      main { padding: 110px 24px 90px; }
-    }
-    @media (max-width: 560px) {
-      .grid { grid-template-columns: 1fr; }
-      header { flex-direction: column; gap: 8px; }
-      .header-contact { text-align: left; }
-      .info-title { max-width: 90vw; }
-    }
-
-    /* ── Page load animation ── */
+    /* Load animation */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    header {
-      animation: fadeUp 0.8s cubic-bezier(0.23,1,0.32,1) both;
-    }
-    .card {
+    .panel {
       animation: fadeUp 0.7s cubic-bezier(0.23,1,0.32,1) both;
     }
   </style>
 </head>
 <body>
 
-  <!-- Custom cursor -->
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- Header -->
   <header>
     <div class="header-name">
-      Mahé RICHARD-SCHMIDT
+      Prénom Nom
       <span>Monteur vidéo</span>
     </div>
     <div class="header-contact">
-      <!-- ↓ Remplace par tes vraies infos ↓ -->
-      <a href="mailto:maherichardschmidt@gmail.com">ton@email.com</a><br>
-      <a href="tel:+33600000000">+33 6 71 45 19 71</a>
+      <a href="mailto:ton@email.com">ton@email.com</a><br>
+      <a href="tel:+33600000000">+33 6 00 00 00 00</a>
     </div>
   </header>
 
-  <!-- Info bar -->
   <div class="info-bar">
     <div class="info-title" id="infoTitle">—</div>
     <div class="info-meta" id="infoMeta"></div>
   </div>
 
-  <!-- Main grid -->
-  <main>
-    <div class="grid" id="grid">
-      <!-- Les cartes sont générées par JS -->
-    </div>
-  </main>
+  <div class="accordion" id="accordion"></div>
 
   <script>
     // ─────────────────────────────────────────────
     // ↓↓↓  MODIFIE ICI TES VIDÉOS  ↓↓↓
-    // Pour chaque vidéo :
-    //   id    → l'ID YouTube (la partie après "watch?v=" dans l'URL)
-    //   title → nom de la vidéo affiché en bas
-    //   real  → nom du réalisateur
-    //   year  → année
-    // ─────────────────────────────────────────────
     const videos = [
-      { id: "CtJ-OYlIE2w", title: "test", real: "Réalisateur", year: "2024" },
-      { id: "dQw4w9WgXcQ", title: "Tit gr vidéo 02", real: "Réalisateur", year: "2023" },
-      { id: "dQw4w9WgXcQ", title: "Titre de la dg 03", real: "Réalisateur", year: "2024" },
-      { id: "dQw4w9WgXcQ", title: "Titre de la vdrgo 04", real: "Réalisateur", year: "2022" },
-      { id: "dQw4w9WgXcQ", title: "Titre de la ngncvidéo 05", real: "Réalisateur", year: "2023" },
-      { id: "dQw4w9WgXcQ", title: "Titre de la vccfbcbidéo 06", real: "Réalisateur", year: "2024" },
-      { id: "dQw4w9WgXcQ", title: "Titre de la cfbcfbvidéo 07", real: "Réalisateur", year: "2023" },
-      { id: "dQw4w9WgXcQ", title: "Titre de la ccfbcfvidéo 08", real: "Réalisateur", year: "2022" },
-      { id: "dQw4w9WgXcQ", title: "Titre de labcfbcfb vidéo 09", real: "Réalisateur", year: "2024" },
-      { id: "dQw4w9WgXcQ", title: "Titre de la cfbcfvidéo 10", real: "Réalisateur", year: "2023" },
-      { id: "dQw4w9WgXcQ", title: "Titre de lcfbcfbca vidéo 11", real: "Réalisateur", year: "2024" },
-      { id: "dQw4w9WgXcQ", title: "Titre cfbde la vidéo 12", real: "Réalisateur", year: "2022" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 01", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 02", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 03", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 04", real: "Réalisateur", year: "2022" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 05", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 06", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 07", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 08", real: "Réalisateur", year: "2022" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 09", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 10", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 11", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 12", real: "Réalisateur", year: "2022" },
     ];
     // ─────────────────────────────────────────────
 
-    const grid = document.getElementById('grid');
+    const accordion = document.getElementById('accordion');
     const infoTitle = document.getElementById('infoTitle');
     const infoMeta  = document.getElementById('infoMeta');
 
-    // Build cards
     videos.forEach((v, i) => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.style.animationDelay = `${i * 0.06}s`;
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      panel.style.animationDelay = `${i * 0.05}s`;
 
-      // Thumb (YouTube thumbnail)
       const thumb = document.createElement('div');
-      thumb.className = 'card-thumb';
+      thumb.className = 'panel-thumb';
       const img = document.createElement('img');
       img.src = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
       img.alt = v.title;
       img.loading = 'lazy';
       img.onerror = () => {
-        thumb.innerHTML = `<div class="card-thumb-placeholder"><span class="thumb-num">0${i+1}</span></div>`;
+        thumb.innerHTML = `<div class="panel-thumb-placeholder"><span class="thumb-num">0${i+1}</span></div>`;
       };
       thumb.appendChild(img);
 
-      // iframe wrap
       const wrap = document.createElement('div');
-      wrap.className = 'card-iframe-wrap';
+      wrap.className = 'panel-iframe-wrap';
       const iframe = document.createElement('iframe');
       iframe.src = `https://www.youtube.com/embed/${v.id}?autoplay=1&mute=1&loop=1&playlist=${v.id}&controls=0&modestbranding=1&rel=0&showinfo=0`;
       iframe.allow = 'autoplay; encrypted-media';
@@ -383,25 +358,29 @@
       iframe.title = v.title;
       wrap.appendChild(iframe);
 
-      card.appendChild(thumb);
-      card.appendChild(wrap);
+      const label = document.createElement('div');
+      label.className = 'panel-label';
+      label.textContent = v.title;
 
-      // Hover info
-      card.addEventListener('mouseenter', () => {
+      panel.appendChild(thumb);
+      panel.appendChild(wrap);
+      panel.appendChild(label);
+
+      panel.addEventListener('mouseenter', () => {
         infoTitle.textContent = v.title;
         infoMeta.innerHTML = `Réal. ${v.real}<br>${v.year}`;
         infoTitle.classList.add('visible');
         infoMeta.classList.add('visible');
       });
-      card.addEventListener('mouseleave', () => {
+      panel.addEventListener('mouseleave', () => {
         infoTitle.classList.remove('visible');
         infoMeta.classList.remove('visible');
       });
 
-      grid.appendChild(card);
+      accordion.appendChild(panel);
     });
 
-    // ── Custom cursor ──
+    // Cursor
     const cursor     = document.getElementById('cursor');
     const cursorRing = document.getElementById('cursorRing');
     let mx = 0, my = 0, rx = 0, ry = 0;
@@ -412,7 +391,6 @@
       cursor.style.top  = my + 'px';
     });
 
-    // Ring follows with lag
     (function animRing() {
       rx += (mx - rx) * 0.12;
       ry += (my - ry) * 0.12;
@@ -421,9 +399,9 @@
       requestAnimationFrame(animRing);
     })();
 
-    document.querySelectorAll('.card').forEach(c => {
-      c.addEventListener('mouseenter', () => cursorRing.classList.add('expand'));
-      c.addEventListener('mouseleave', () => cursorRing.classList.remove('expand'));
+    document.querySelectorAll('.panel').forEach(p => {
+      p.addEventListener('mouseenter', () => cursorRing.classList.add('expand'));
+      p.addEventListener('mouseleave', () => cursorRing.classList.remove('expand'));
     });
   </script>
 </body>
