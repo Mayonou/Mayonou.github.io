@@ -1,390 +1,408 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Portfolio — Monteur Vidéo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&family=Outfit:wght@200;300&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --white: #fafaf8;
-      --ink:   #111110;
-      --muted: #999990;
-      --accent:#c8b89a;
-      --line:  #ddddd5;
-      --bar-h: 120px;
+      --off: #f0efe9;
+      --ink: #111110;
+      --muted: #888880;
+      --accent: #c8b89a;
+      --line: #e2e0d8;
     }
 
     html, body {
-      width: 100%; height: 100%;
+      height: 100%;
       overflow: hidden;
-      background: var(--white);
+    }
+
+    body {
       font-family: 'DM Mono', monospace;
+      background: var(--white);
       color: var(--ink);
       cursor: none;
     }
 
-    /* ── Cursor ── */
-    #cur-dot {
-      position: fixed; z-index: 9999;
-      width: 7px; height: 7px;
-      background: var(--ink); border-radius: 50%;
-      transform: translate(-50%,-50%);
+    /* ── Custom cursor ── */
+    .cursor {
+      position: fixed;
+      width: 8px; height: 8px;
+      background: var(--ink);
+      border-radius: 50%;
       pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
     }
-    #cur-ring {
-      position: fixed; z-index: 9998;
-      width: 34px; height: 34px;
-      border: 1px solid var(--ink); border-radius: 50%;
-      transform: translate(-50%,-50%);
-      pointer-events: none; opacity: .35;
-      transition: width .3s ease, height .3s ease, opacity .3s ease;
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      opacity: 0.4;
+      transition: width 0.35s ease, height 0.35s ease, opacity 0.35s ease;
     }
-    #cur-ring.big { width: 60px; height: 60px; opacity: .12; }
-
-    /* ── Layout shell ── */
-    #shell {
-      position: fixed; inset: 0;
-      display: flex; flex-direction: column;
+    .cursor-ring.expand {
+      width: 64px; height: 64px;
+      opacity: 0.15;
     }
 
     /* ── Header ── */
-    #hdr {
-      height: var(--bar-h);
-      flex-shrink: 0;
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 28px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: linear-gradient(to bottom, var(--white) 60%, transparent);
+      animation: fadeDown 0.8s cubic-bezier(0.23,1,0.32,1) both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .header-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+    .header-name span {
+      display: block;
+      font-size: 0.65em;
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .header-contact {
+      text-align: right;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      line-height: 1.8;
+    }
+    .header-contact a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .header-contact a:hover { color: var(--ink); }
+
+    /* ── Info bar (fixed bottom) ── */
+    .info-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      background: linear-gradient(to top, var(--white) 60%, transparent);
+      pointer-events: none;
+    }
+
+    .info-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      max-width: 60vw;
+      line-height: 1.1;
+    }
+    .info-title.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .info-meta {
+      text-align: right;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease 0.05s, transform 0.4s ease 0.05s;
+      line-height: 1.9;
+    }
+    .info-meta.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Accordion ── */
+    .accordion {
+      display: flex;
+      flex-direction: row;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .panel {
+      flex: 1 1 0;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      transition: flex 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+      background: var(--off);
+      min-width: 0;
+    }
+
+    /* Siblings shrink when one is hovered */
+    .accordion:has(.panel:hover) .panel {
+      flex: 0.05 1 0;
+    }
+    .accordion .panel:hover {
+      flex: 16 1 0;
+    }
+
+    /* Thumbnail */
+    .panel-thumb {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      transition: opacity 0.5s ease;
+    }
+    .panel-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(15%);
+    }
+
+    .panel:hover .panel-thumb {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .panel-thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #e8e6de 0%, #d4d1c7 100%);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 48px;
-      border-bottom: 1px solid var(--line);
-      animation: fadeDown .7s cubic-bezier(.23,1,.32,1) both;
+      justify-content: center;
     }
-    @keyframes fadeDown {
-      from { opacity:0; transform:translateY(-14px); }
-      to   { opacity:1; transform:translateY(0); }
+    .thumb-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--accent);
+      opacity: 0.6;
+      writing-mode: vertical-rl;
     }
-    /* 4. Nouvelle police pour le nom — Outfit, légère, sans italique */
-    .hdr-name {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 200;
-      font-size: 1.3rem;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      line-height: 1.15;
-    }
-    .hdr-name small {
-      display: block;
-      font-family: 'DM Mono', monospace;
-      font-size: .58rem; font-weight: 300;
-      letter-spacing: .14em; text-transform: uppercase;
-      color: var(--muted); margin-top: 6px;
-    }
-    .hdr-contact {
-      font-size: .7rem; color: var(--muted);
-      letter-spacing: .05em; line-height: 2;
-      text-align: right;
-    }
-    .hdr-contact a { color: inherit; text-decoration: none; transition: color .2s; }
-    .hdr-contact a:hover { color: var(--ink); }
-
-    /* ── Accordion zone ── */
-    #acc-wrap {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* ── Panels container ── */
-    #acc {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: row;
-    }
-
-    /* ── Individual panel ── */
-    .panel {
-      position: relative;
-      height: 100%;
-      overflow: hidden;
-      flex-shrink: 0;
-      transition: width .55s cubic-bezier(.23,1,.32,1);
-      border-right: 1px solid rgba(255,255,255,0.15);
-    }
-    .panel:last-child { border-right: none; }
-
-    /* 2. Bloc couleur dégradé (remplace la miniature) */
-    .panel-color {
-      position: absolute; inset: 0; z-index: 2;
-      transition: opacity .45s ease;
-    }
-    .panel.active .panel-color { opacity: 0; pointer-events: none; }
 
     /* iframe */
-    .panel-iframe { position: absolute; inset: 0; z-index: 1; }
-    .panel-iframe iframe {
-      width: 100%; height: 100%;
-      border: none; display: block;
+    .panel-iframe-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    .panel-iframe-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
       pointer-events: none;
     }
-    .panel.active .panel-iframe iframe { pointer-events: auto; }
+    .panel:hover .panel-iframe-wrap iframe {
+      pointer-events: auto;
+    }
 
-    /* 3. Titre vertical — blanc avec contour noir */
-    .panel-vlabel {
+    /* Vertical label */
+    .panel-label {
       position: absolute;
-      bottom: 36px; left: 50%;
+      bottom: 52px;
+      left: 50%;
       transform: translateX(-50%) rotate(180deg);
       writing-mode: vertical-rl;
-      font-size: .58rem; letter-spacing: .13em;
+      text-orientation: mixed;
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #ffffff;
-      -webkit-text-stroke: .4px #111110;
-      text-shadow: 0 0 6px rgba(0,0,0,.4);
-      white-space: nowrap; z-index: 6;
-      transition: opacity .3s ease;
+      color: var(--muted);
+      white-space: nowrap;
+      z-index: 5;
+      opacity: 1;
+      transition: opacity 0.25s ease;
       pointer-events: none;
-      max-height: 55%;
       overflow: hidden;
+      max-height: 60vh;
+      text-overflow: ellipsis;
     }
-    .panel.active .panel-vlabel { opacity: 0; }
+    .panel:hover .panel-label {
+      opacity: 0;
+    }
 
     /* Accent line */
     .panel::after {
       content: '';
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 2px; background: var(--accent);
-      transform: scaleX(0); transform-origin: left;
-      transition: transform .5s cubic-bezier(.23,1,.32,1);
-      z-index: 10;
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s cubic-bezier(0.23,1,0.32,1);
+      z-index: 20;
     }
-    .panel.active::after { transform: scaleX(1); }
+    .panel:hover::after {
+      transform: scaleX(1);
+    }
 
-    /* ── Info bar ── */
-    #info {
-      height: var(--bar-h);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 48px;
-      border-top: 1px solid var(--line);
-      pointer-events: none;
+    /* Separator */
+    .panel + .panel {
+      border-left: 1px solid var(--line);
     }
-    #info-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300; font-style: italic;
-      font-size: clamp(1.3rem, 2.2vw, 2rem);
-      letter-spacing: -.01em;
-      opacity: 0; transform: translateY(6px);
-      transition: opacity .35s ease, transform .35s ease;
-      flex: 1;
-    }
-    #info-title.on { opacity: 1; transform: translateY(0); }
-
-    /* 1. Zone artiste — centre */
-    #info-artist {
-      font-family: 'DM Mono', monospace;
-      font-weight: 300;
-      font-size: .68rem;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-align: center;
-      flex: 1;
-      opacity: 0; transform: translateY(6px);
-      transition: opacity .35s ease .08s, transform .35s ease .08s;
-    }
-    #info-artist.on { opacity: 1; transform: translateY(0); }
-
-    #info-meta {
-      font-size: .68rem; color: var(--muted);
-      letter-spacing: .09em; text-transform: uppercase;
-      text-align: right; line-height: 2;
-      flex: 1;
-      opacity: 0; transform: translateY(6px);
-      transition: opacity .35s ease .05s, transform .35s ease .05s;
-    }
-    #info-meta.on { opacity: 1; transform: translateY(0); }
 
     /* Load animation */
     @keyframes fadeUp {
-      from { opacity:0; transform:translateY(18px); }
-      to   { opacity:1; transform:translateY(0); }
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-    .panel { animation: fadeUp .65s cubic-bezier(.23,1,.32,1) both; }
+    .panel {
+      animation: fadeUp 0.7s cubic-bezier(0.23,1,0.32,1) both;
+    }
   </style>
 </head>
 <body>
 
-<div id="cur-dot"></div>
-<div id="cur-ring"></div>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
 
-<div id="shell">
-
-  <!-- Header -->
-  <header id="hdr">
-    <div class="hdr-name">
+  <header>
+    <div class="header-name">
       Prénom Nom
-      <small>Monteur vidéo</small>
+      <span>Monteur vidéo</span>
     </div>
-    <div class="hdr-contact">
+    <div class="header-contact">
       <a href="mailto:ton@email.com">ton@email.com</a><br>
       <a href="tel:+33600000000">+33 6 00 00 00 00</a>
     </div>
   </header>
 
-  <!-- Accordion -->
-  <div id="acc-wrap">
-    <div id="acc"></div>
+  <div class="info-bar">
+    <div class="info-title" id="infoTitle">—</div>
+    <div class="info-meta" id="infoMeta"></div>
   </div>
 
-  <!-- Info bar -->
-  <div id="info">
-    <div id="info-title"></div>
-    <div id="info-artist"></div>
-    <div id="info-meta"></div>
-  </div>
+  <div class="accordion" id="accordion"></div>
 
-</div>
+  <script>
+    // ─────────────────────────────────────────────
+    // ↓↓↓  MODIFIE ICI TES VIDÉOS  ↓↓↓
+    const videos = [
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 01", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 02", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 03", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 04", real: "Réalisateur", year: "2022" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 05", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 06", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 07", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 08", real: "Réalisateur", year: "2022" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 09", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 10", real: "Réalisateur", year: "2023" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 11", real: "Réalisateur", year: "2024" },
+      { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 12", real: "Réalisateur", year: "2022" },
+    ];
+    // ─────────────────────────────────────────────
 
-<script>
-// ─────────────────────────────────────────────────────
-// ↓↓↓  TES VIDÉOS  ↓↓↓
-const videos = [
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 01", real: "Réalisateur", year: "2024" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 02", real: "Réalisateur", year: "2023" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 03", real: "Réalisateur", year: "2024" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 04", real: "Réalisateur", year: "2022" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 05", real: "Réalisateur", year: "2023" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 06", real: "Réalisateur", year: "2024" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 07", real: "Réalisateur", year: "2023" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 08", real: "Réalisateur", year: "2022" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 09", real: "Réalisateur", year: "2024" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 10", real: "Réalisateur", year: "2023" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 11", real: "Réalisateur", year: "2024" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 12", real: "Réalisateur", year: "2022" },
-];
-// ─────────────────────────────────────────────────────
+    const accordion = document.getElementById('accordion');
+    const infoTitle = document.getElementById('infoTitle');
+    const infoMeta  = document.getElementById('infoMeta');
 
-const N         = videos.length;
-const acc       = document.getElementById('acc');
-const infoTitle  = document.getElementById('info-title');
-const infoArtist = document.getElementById('info-artist');
-const infoMeta   = document.getElementById('info-meta');
-const accWrap    = document.getElementById('acc-wrap');
+    videos.forEach((v, i) => {
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      panel.style.animationDelay = `${i * 0.05}s`;
 
-// 2. Génère les couleurs de dégradé blanc → noir réparties sur N panneaux
-function panelColor(i) {
-  const light = Math.round(255 - (i / (N - 1)) * 255);
-  return `rgb(${light},${light},${light})`;
-}
+      const thumb = document.createElement('div');
+      thumb.className = 'panel-thumb';
+      const img = document.createElement('img');
+      img.src = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
+      img.alt = v.title;
+      img.loading = 'lazy';
+      img.onerror = () => {
+        thumb.innerHTML = `<div class="panel-thumb-placeholder"><span class="thumb-num">0${i+1}</span></div>`;
+      };
+      thumb.appendChild(img);
 
-// Build panels
-const panels = videos.map((v, i) => {
-  const panel = document.createElement('div');
-  panel.className = 'panel';
-  panel.style.animationDelay = `${i * 0.045}s`;
+      const wrap = document.createElement('div');
+      wrap.className = 'panel-iframe-wrap';
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${v.id}?autoplay=1&mute=1&loop=1&playlist=${v.id}&controls=0&modestbranding=1&rel=0&showinfo=0`;
+      iframe.allow = 'autoplay; encrypted-media';
+      iframe.allowFullscreen = true;
+      iframe.title = v.title;
+      wrap.appendChild(iframe);
 
-  // Bloc couleur (remplace miniature)
-  const colorBlock = document.createElement('div');
-  colorBlock.className = 'panel-color';
-  colorBlock.style.background = panelColor(i);
+      const label = document.createElement('div');
+      label.className = 'panel-label';
+      label.textContent = v.title;
 
-  // iframe
-  const iframeWrap = document.createElement('div');
-  iframeWrap.className = 'panel-iframe';
-  const iframe = document.createElement('iframe');
-  iframe.src = `https://www.youtube.com/embed/${v.id}?autoplay=1&mute=1&loop=1&playlist=${v.id}&controls=0&modestbranding=1&rel=0&showinfo=0`;
-  iframe.allow = 'autoplay; encrypted-media';
-  iframe.allowFullscreen = true;
-  iframe.title = v.title;
-  iframeWrap.appendChild(iframe);
+      panel.appendChild(thumb);
+      panel.appendChild(wrap);
+      panel.appendChild(label);
 
-  // Vertical label
-  const label = document.createElement('div');
-  label.className = 'panel-vlabel';
-  label.textContent = v.title;
+      panel.addEventListener('mouseenter', () => {
+        infoTitle.textContent = v.title;
+        infoMeta.innerHTML = `Réal. ${v.real}<br>${v.year}`;
+        infoTitle.classList.add('visible');
+        infoMeta.classList.add('visible');
+      });
+      panel.addEventListener('mouseleave', () => {
+        infoTitle.classList.remove('visible');
+        infoMeta.classList.remove('visible');
+      });
 
-  panel.appendChild(colorBlock);
-  panel.appendChild(iframeWrap);
-  panel.appendChild(label);
-  acc.appendChild(panel);
-  return panel;
-});
+      accordion.appendChild(panel);
+    });
 
-// ── Width logic ──
-function setWidths(activeIdx) {
-  const total  = accWrap.offsetWidth;
-  const ratio  = 16 / 9;
-  const h      = accWrap.offsetHeight;
-  const activeW = Math.min(Math.round(ratio * h), Math.round(total * 0.78));
-  const restW   = Math.round((total - activeW) / (N - 1));
+    // Cursor
+    const cursor     = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
 
-  panels.forEach((p, i) => {
-    if (activeIdx === null) {
-      p.style.width = (total / N) + 'px';
-      p.classList.remove('active');
-    } else if (i === activeIdx) {
-      p.style.width = activeW + 'px';
-      p.classList.add('active');
-    } else {
-      p.style.width = restW + 'px';
-      p.classList.remove('active');
-    }
-  });
-}
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top  = my + 'px';
+    });
 
-setWidths(null);
+    (function animRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      cursorRing.style.left = rx + 'px';
+      cursorRing.style.top  = ry + 'px';
+      requestAnimationFrame(animRing);
+    })();
 
-// Mouse events
-panels.forEach((p, i) => {
-  p.addEventListener('mouseenter', () => {
-    setWidths(i);
-    infoTitle.textContent = videos[i].title;
-    infoMeta.innerHTML = videos[i].real
-      ? `Réal. ${videos[i].real}<br>${videos[i].year}`
-      : videos[i].year;
-    infoTitle.classList.add('on');
-    infoMeta.classList.add('on');
-    // 1. Artiste
-    if (videos[i].artist) {
-      infoArtist.textContent = videos[i].artist;
-      infoArtist.classList.add('on');
-    } else {
-      infoArtist.textContent = '';
-      infoArtist.classList.remove('on');
-    }
-    document.getElementById('cur-ring').classList.add('big');
-  });
-});
-
-accWrap.addEventListener('mouseleave', () => {
-  setWidths(null);
-  infoTitle.classList.remove('on');
-  infoMeta.classList.remove('on');
-  infoArtist.classList.remove('on');
-  document.getElementById('cur-ring').classList.remove('big');
-});
-
-window.addEventListener('resize', () => setWidths(null));
-
-// ── Cursor ──
-const dot  = document.getElementById('cur-dot');
-const ring = document.getElementById('cur-ring');
-let mx=0, my=0, rx=0, ry=0;
-
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  dot.style.left = mx + 'px';
-  dot.style.top  = my + 'px';
-});
-(function loop() {
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  ring.style.left = rx + 'px';
-  ring.style.top  = ry + 'px';
-  requestAnimationFrame(loop);
-})();
-</script>
+    document.querySelectorAll('.panel').forEach(p => {
+      p.addEventListener('mouseenter', () => cursorRing.classList.add('expand'));
+      p.addEventListener('mouseleave', () => cursorRing.classList.remove('expand'));
+    });
+  </script>
 </body>
 </html>
