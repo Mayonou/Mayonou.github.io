@@ -135,11 +135,18 @@
       bottom: 36px; left: 50%;
       transform: translateX(-50%) rotate(180deg);
       writing-mode: vertical-rl;
-      font-size: .58rem; letter-spacing: .13em;
+      font-size: .90rem; letter-spacing: .13em;
       text-transform: uppercase;
       color: #ffffff;
-      -webkit-text-stroke: .4px #111110;
-      text-shadow: 0 0 6px rgba(0,0,0,.4);
+      text-shadow: 
+        -1px -1px 0 rgba(0,0,0,0.9),
+         1px -1px 0 rgba(0,0,0,0.9),
+        -1px  1px 0 rgba(0,0,0,0.9),
+         1px  1px 0 rgba(0,0,0,0.9),
+        -1px  0   0 rgba(0,0,0,0.9),
+         1px  0   0 rgba(0,0,0,0.9),
+         0   -1px 0 rgba(0,0,0,0.9),
+         0    1px 0 rgba(0,0,0,0.9);
       white-space: nowrap; z-index: 6;
       transition: opacity .3s ease;
       pointer-events: none;
@@ -185,7 +192,7 @@
     #info-artist {
       font-family: 'DM Mono', monospace;
       font-weight: 300;
-      font-size: .68rem;
+      font-size: .70rem;
       letter-spacing: .12em;
       text-transform: uppercase;
       color: var(--muted);
@@ -224,12 +231,12 @@
   <!-- Header -->
   <header id="hdr">
     <div class="hdr-name">
-      Prénom Nom
+      Mahé RICHARD-SCHMIDT
       <small>Monteur vidéo</small>
     </div>
     <div class="hdr-contact">
-      <a href="mailto:ton@email.com">ton@email.com</a><br>
-      <a href="tel:+33600000000">+33 6 00 00 00 00</a>
+      <a href="mailto:maherichardschmidt@gmail.com">maherichardschmidt@gmail.com</a><br>
+      <a href="tel:+33671451971">+33 6 71 45 19 71</a>
     </div>
   </header>
 
@@ -251,18 +258,15 @@
 // ─────────────────────────────────────────────────────
 // ↓↓↓  TES VIDÉOS  ↓↓↓
 const videos = [
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 01", real: "Réalisateur", year: "2024" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 02", real: "Réalisateur", year: "2023" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 03", real: "Réalisateur", year: "2024" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 04", real: "Réalisateur", year: "2022" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 05", real: "Réalisateur", year: "2023" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 06", real: "Réalisateur", year: "2024" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 07", real: "Réalisateur", year: "2023" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 08", real: "Réalisateur", year: "2022" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 09", real: "Réalisateur", year: "2024" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 10", real: "Réalisateur", year: "2023" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 11", real: "Réalisateur", year: "2024" },
-  { id: "dQw4w9WgXcQ", title: "Titre de la vidéo 12", real: "Réalisateur", year: "2022" },
+  { id: "XYP9Ufletss", title: "POUF", real: "Mahé RICHARD-SCHMIDT", year: "2025" },
+  { id: "I80fSVbp-eE", title: "Neoma", real: "Nicolas ROMIEU", year: "2023" },  
+  { id: "muCyrhqdBwA", title: "Garage LMR", real: "Nicolas ROMIEU", year: "2023" },  
+  { id: "XqMseG4eQ9o", title: "Renée Costes", real: "Nicolas ROMIEU", year: "2023" },
+  { id: "XTDjJ9pvYJI", title: "Albert Koski", real: "Nicolas ROMIEU", year: "2022" },  
+  { id: "VEVohpQye-I", title: "Crash au Mali", year: "2023" },
+  { id: "nUmqWk7Q4no", title: "Luke Anger - Continuum", real: "Nicolas ROMIEU", year: "2023", },
+  { id: "TVLk2qBD0DM", title: "La chine et le Ping-Pong", year: "2024" },
+  { id: "Nog0dxvLhQY", title: "Murphy X Frank Takuma - Centaines de roses", real: "Léo VIEIRA", year: "2024" },
 ];
 // ─────────────────────────────────────────────────────
 
@@ -369,22 +373,21 @@ accWrap.addEventListener('mouseleave', () => {
 window.addEventListener('resize', () => setWidths(null));
 
 // ── Cursor ──
-const dot  = document.getElementById('cur-dot');
-const ring = document.getElementById('cur-ring');
-let mx=0, my=0, rx=0, ry=0;
-
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  dot.style.left = mx + 'px';
-  dot.style.top  = my + 'px';
-});
-(function loop() {
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  ring.style.left = rx + 'px';
-  ring.style.top  = ry + 'px';
-  requestAnimationFrame(loop);
-})();
-</script>
-</body>
-</html>
+#cursor {
+  position: fixed; z-index: 9999;
+  width: 32px; height: 32px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+}
+#cursor::before,
+#cursor::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 100%; height: 3px;
+  background: #ffffff;
+  border-radius: 2px;
+}
+#cursor::before { transform: translate(-50%, -50%) rotate(45deg); }
+#cursor::after  { transform: translate(-50%, -50%) rotate(-45deg); }
