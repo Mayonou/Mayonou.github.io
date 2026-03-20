@@ -25,6 +25,7 @@
       color: var(--ink);
       cursor: none;
     }
+    a, button, iframe {cursor: none;}
 
     /* ── Cursor ── */
     #cursor {
@@ -390,8 +391,6 @@ document.addEventListener('mousemove', e => {
   cursor.style.left = e.clientX + 'px';
   cursor.style.top  = e.clientY + 'px';
 });
-
-a, button, iframe {cursor: none;}
 
 </script>
 </body>
